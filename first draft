@@ -1,0 +1,95 @@
+My implementation of the 42 - push_swap project
+
+In this article, I will explain how I decided to complete the project push_swap of the common core of the 42 cursus. I won't go too much into the details of neither the code nor the implementation of the algorithm but I want to give you the gist of it, so that this could inspire you in case you don't really know what to do or how to begin.
+
+SOME CONTEXT:
+
+Push_swap.
+Because Swap_push isn't as natural.
+This project will make you sort data on a stack, with a limited set of instructions, using the lowest possible number of actions. To succeed you’ll have to manipulate various types of algorithms and choose the one (of many) most appropriate solution for an optimized data sorting.
+
+That beeing said, here are the actions you may use:
+sa, sb, ss to swap numbers, pa, pb to push them, and ra, rb, rra, rrb, rr, rrr to rotate piles. Also, you are allowed to orbanize your data in two piles: pile_a, which will include all the integers at the beggining of your program, and pile_b, which is empty at the beggining and should be empty at the end as well.
+
+Fine. As with every 42 project, your algorithm and its performance will be evaluated by your peers. By performance, I mean the number of actions needed to sort the list of integers given as input. This performance will be graded, depending on how many integers were given to your program as follows:
+
+EVALUATION CRITERIA
+
+SIMPLE VERSION:
+algo sorts "2 1 0" in 2 or 3 instructions -> OK
+algo sorts "1 5 2 4 3" in 12 instructions or less -> OK (kudos if less than 8 :)
+
+This means that your algo should sort a list of 3 integers with two or three instructions AT MOST. And a list of % integers with at most 12 instructions.
+
+MIDDLE VERSION
+algorithm sorts 100 random numbers -> OK
+. less than 700 instructions -> grade 5
+. less than 900 instructions -> grade 4
+. less than 1100 instructions -> grade 3
+. less than 1300 instructions -> grade 2
+. less than 1500 instructions -> grade 1
+
+That means that to get 5 points out of 5 for the middle version of your algorithm, it should sort a list of 100 integers in less than 700 instructions, less than 900 instructions to get 4 out of 5, and so one. No points at all if your algorithm needs more than 1500 instructions.
+
+Advanced VERSION
+algorithm sorts 500 random numbers -> OK
+. less than 5500 instructions  -> grade 5
+. less than 7000 instructions  -> grade 4
+. less than 8500 instructions  -> grade 3
+. less than 10000 instructions -> grade 2
+. less than 11500 instructions -> grade 1
+
+The same logic is applied to a list of 500 random integers, with grades ranging from 5 to 0, according to the performances of your algorithm.
+
+So much for the introduction. Now is time for me to explain how I tackled the beast.
+First of all, I had to decide how to structure my data. Some of my fellow co-students opted for simple integer tables, which is a totally valid approach, avoiding so the complexity brought by linked lists. But I love complexity, and it was a perfect oportunity to deepen my understanding of this data structure, which is way too useful to be ignored in such a curiculum. And I started tearing my libft appart, improving it by adding functions able to create, manage and dispose of circular double linked lists. Holly cow, what a ride.
+
+Double linked lists are handy to run through the list in both directions, and circular lists make it easier for rotation like instructions: moving only one pointer does the trick. Furthermore, and because I want to learn things, it made more sense for me to handle pile_a and pile_b as linked lists.
+
+By the way, one important part of the project before starting working on your sorting algorithm are the functions you'll need to execute the different instructions and reorder the piles accordingly. Make sure to test your functions before moving on.
+
+One other very important thing I want to pinpoint right now about memory management: every calculation must be done on the stack. Malloc as little as you can, or Valgrind will be your fiercest foe.
+In my implementation of Push_swap, I malloc'd my two piles, a tab of ints for the values and a tab of ints for the LIS and that's it. Oh yeah, and a struct for some random values here and there, but nothing too scary. This way, at the end of my program, or in case of unexpected behaviour, a simple function free_all(things_to_free) make Valgrind happy.
+
+Now, and after checking your input and coding all the instruction related functions, it is time to have a look at my algorithm.
+
+Tools You Can Use
+To develop this algorithm I used mainly two tools:
+- a random number generator (you'll find many online, I used this one)
+- push_swap visualizer : veryveryvery useful repo to see how your algorithm handle your piles. Perfect for optimization and to spot problems. You get to know your algorithm performances as well and you can generate random numbers directly form this tester. 
+
+My Push_Swap Algorithm In Four Steps
+
+Step One: get the Longest Increasing Subsequence (LIS)
+The first thing I do, and I did not see many students do it around me, is calculate the Longest Increasing Subsequence (LIS) of pile_a. Longest Increasing Subsequence (LIS)? It is basically the longest list of numbers already sorted in another list of integers. This way, I know taht they are already ordered, and I don't move them in the next steps of my algorithm.
+How do I get the Longest Increasing Subsequence
+You might say that there's no point doing it since it is only a minor improvement that does not impact greatly the performance of the algorithm on bigger lists of integers, but it's working well for smaller inputs. And knowing how to calculate it might be useful in other situations, who knows?
+Well I could here very well explain how to get a LIS from a given list of integers, but it would be quite lengthy, full of maths and I would lose most of you readers. But I'll share with you the ressource I used to do this one part of the algorithm.
+First I get the length of the LIS through binary search.
+You get the logic from take U forward, who provides a simple explanation on Youtube.
+https://www.youtube.com/watch?v=on2hvxBXJH4&t=679s
+This length can help you when implementing then the calculation of the LIS through Dynamic Programming, an algorithm rather easy to understand and explained by vivekanand khyade on Youtube as well.
+https://www.youtube.com/watch?v=on2hvxBXJH4&t=679s
+There might be other ressources online to calculate the LIS on your own way, be curious and investigate.
+
+Step Two: Push All The Non-LIS Numbers to Pile_b
+As a second step, I push every number that is not part of the LIS to pile_b. But before doing it, I calculated a pivot number to pre sort my data. Nothing too fancy: create a tab the size of pile_a on the stack, copy all your numers in it and sort them (bubble sort works just fine). take the value at the middle index and you have it.
+I so push all values superior to this pivot to the upper part of pile_b (simply "pb"), while all other values go to the lower part (pb + rrb).
+After having done this, you have values sorted in pile_a and values pre-sorted in pile_b.
+
+Step Three: Push Back to Pile_b
+This is probably the most important part of the algorithm. Now that you have your piles organized as they are, you need to push all numbers so that pile_a is ordered once you are done. And to do that, you'll have to calculate. And that's what computers do best.
+For each element of pile_b, I calculate how many moves it will take to move it from its position in pile_b to the position it belongs to in pile_a.
+. how many rotations do I need in pile_b to get the element to the top? (remember that you can rotate the pile in both directions, and an element at the base of the pile could "cost" less to mave than one at the top.
+. how many rotations do I need in pile_a to get the element to its target position?
+Of course, you keep a variable of the potential "winner" during the process to avoid unnecessary calculations. And once you know which element costs the less to move from b to a, you only need to convert the moves needed to instructions.
+The way I did this is quite simple. I uses a variable to store the rotations needed on both piles: positive values to rotate and negative values to reverse rotate. So for example, if I have my variable instructions_tab[2] with the values 3 and 2, it means that I need to rotate pile_a 3 times and rotate pile_b 2 times, which results in the instruction set rr, rr, ra. Another example: if I have my variable instructions_tab[2] with the values -2 and 1, it means that I need to reverse rotate pile_a 2 times and rotate pile_b 1 time, which results in the instruction set rra, rra, rb. You get the idea.
+
+Step Four: Final Rotate Pile_a To Get The Lowest Number To The Top
+The title of this section is quite self explanatory, and you should normally not have to check whether you'd better reverse rotate instead of rotating pile_a to get the lowest number to the top quicker. But in case you do, this is something you'll need to check.
+
+Voila, there you have it.
+One thing I had to add so that this algorithm would meet all evaluation criteria is a function to check whether the pile is in reversed order. In this case, I start by swapping the first two elements of pile_a. Because remember that I first calculate the LIS, and its length would be of 1 if the pile were in reversed order, but you'll understand what I mean when you get there.
+
+Well, I'm aware that this article might have been perhaps somehow difficult to understand fully, but I hope to have at least inspired you somehow to get your project started and implement a way that will bring you a broader understanding of the concepts it is supposed to get accross to you.
+That beeing said, enjoy your coding journey and have a good one !
