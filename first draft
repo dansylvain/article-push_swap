@@ -9,7 +9,7 @@ Because Swap_push isn't as natural.
 This project will make you sort data on a stack, with a limited set of instructions, using the lowest possible number of actions. To succeed you’ll have to manipulate various types of algorithms and choose the one (of many) most appropriate solution for an optimized data sorting.
 
 That beeing said, here are the actions you may use:
-sa, sb, ss to swap numbers, pa, pb to push them, and ra, rb, rra, rrb, rr, rrr to rotate piles. Also, you are allowed to orbanize your data in two piles: pile_a, which will include all the integers at the beggining of your program, and pile_b, which is empty at the beggining and should be empty at the end as well.
+sa, sb, ss to swap numbers, pa, pb to push them, and ra, rb, rra, rrb, rr, rrr to rotate piles. Also, you a	re allowed to orbanize your data in two piles: pile_a, which will include all the integers at the beggining of your program, and pile_b, which is empty at the beggining and should be empty at the end as well.
 
 Fine. As with every 42 project, your algorithm and its performance will be evaluated by your peers. By performance, I mean the number of actions needed to sort the list of integers given as input. This performance will be graded, depending on how many integers were given to your program as follows:
 
